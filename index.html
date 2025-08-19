@@ -1,284 +1,191 @@
-import React, { useMemo } from "react";
-import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { 
-  Rocket, Orbit, Sparkles, Globe2, 
-  ArrowRight, ArrowDown, Building2, Star 
-} from "lucide-react";
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>星宇心愿 StellarX</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- TailwindCSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 图标库（lucide） -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @keyframes twinkle {
+      from { opacity: .15; transform: translateY(0px);}
+      to { opacity: .9; transform: translateY(-.6px);}
+    }
+  </style>
+</head>
+<body class="min-h-screen w-full text-white bg-[#030712] overflow-x-hidden relative">
 
-export default function StellarXLanding() {
-  return (
-    <div className="min-h-screen w-full text-white bg-[#030712] overflow-x-hidden">
-      <Starfield />
-      <Header />
-      <Hero />
-      <Trustbar />
-      {/* Features 与 Manifest 如果有内容就在别处补充 */}
-      <Stats />
-      <CTA />
-      <Footer />
-    </div>
-  );
-}
+  <!-- 星野背景 -->
+  <div id="starfield" class="pointer-events-none fixed inset-0 -z-10"></div>
+  <script>
+    const starfield = document.getElementById("starfield");
+    for(let i=0; i<140; i++){
+      const s = document.createElement("span");
+      const size = Math.random() * 1.2 + 0.2;
+      s.className="absolute rounded-full bg-white";
+      s.style.left = Math.random()*100+"%";
+      s.style.top = Math.random()*100+"%";
+      s.style.width = size+"px";
+      s.style.height= size+"px";
+      s.style.opacity=Math.random()*0.9+0.1;
+      s.style.filter="drop-shadow(0 0 6px rgba(255,255,255,0.4))";
+      s.style.animation=`twinkle ${Math.random()*4+2}s ease-in-out ${i*0.13}s infinite alternate`;
+      starfield.appendChild(s);
+    }
+  </script>
 
-/** 星野背景 */
-function Starfield() {
-  const stars = useMemo(
-    () =>
-      Array.from({ length: 140 }).map((_, i) => ({
-        id: i,
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        s: Math.random() * 1.2 + 0.2,
-        o: Math.random() * 0.9 + 0.1,
-        d: Math.random() * 4 + 2,
-      })),
-    []
-  );
-
-  return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
-      <div className="absolute inset-0 bg-[radial-gradient(1000px_600px_at_70%_-10%,#1d2240,transparent),radial-gradient(800px_500px_at_10%_20%,#0b1226,transparent),#04060e]" />
-      <div className="absolute -top-24 right-[-10%] h-[42rem] w-[42rem] rounded-full bg-indigo-600/20 blur-[120px]" />
-      <div className="absolute bottom-[-20%] left-[-10%] h-[36rem] w-[36rem] rounded-full bg-fuchsia-600/15 blur-[120px]" />
-      {stars.map((s) => (
-        <span
-          key={s.id}
-          className="absolute rounded-full bg-white"
-          style={{
-            left: `${s.x}%`,
-            top: `${s.y}%`,
-            width: s.s,
-            height: s.s,
-            opacity: s.o,
-            filter: "drop-shadow(0 0 6px rgba(255,255,255,0.4))",
-            animation: `twinkle ${s.d}s ease-in-out ${s.id * 0.13}s infinite alternate`,
-          }}
-        />
-      ))}
-      <style>{`
-        @keyframes twinkle {
-          from { opacity: .15; transform: translateY(0px)}
-          to   { opacity: .9;  transform: translateY(-.6px)}
-        }
-      `}</style>
-    </div>
-  );
-}
-
-/** 顶部导航 */
-function Header() {
-  return (
-    <header className="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-black/30 border-b border-white/5">
-      <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="h-7 w-7 rounded-full bg-gradient-to-tr from-indigo-400 to-cyan-300 flex items-center justify-center shadow-[0_0_30px_rgba(56,189,248,0.45)]">
-            <Sparkles className="h-4 w-4 text-black" />
-          </div>
-          <span className="font-semibold tracking-wide">星宇心愿 StellarX</span>
+  <!-- 顶部导航 -->
+  <header class="sticky top-0 z-40 backdrop-blur bg-black/30 border-b border-white/5">
+    <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="h-7 w-7 rounded-full bg-gradient-to-tr from-indigo-400 to-cyan-300 flex items-center justify-center shadow-[0_0_30px_rgba(56,189,248,0.45)]">
+          <i data-lucide="sparkles" class="w-4 h-4 text-black"></i>
         </div>
-        <nav className="hidden md:flex items-center gap-6 text-sm text-white/80">
-          <a href="#features" className="hover:text-white">产品</a>
-          <a href="#manifest" className="hover:text-white">任务清单</a>
-          <a href="#stats" className="hover:text-white">数据</a>
-          <a href="#contact" className="hover:text-white">联系</a>
-        </nav>
-        <Button className="bg-white text-black rounded-full px-5 py-2 font-medium hover:bg-white/90">
-          立即合作
-        </Button>
+        <span class="font-semibold tracking-wide">星宇心愿 StellarX</span>
       </div>
-    </header>
-  );
-}
+      <nav class="hidden md:flex items-center gap-6 text-sm text-white/80">
+        <a href="#features" class="hover:text-white">产品</a>
+        <a href="#manifest" class="hover:text-white">任务清单</a>
+        <a href="#stats" class="hover:text-white">数据</a>
+        <a href="#contact" class="hover:text-white">联系</a>
+      </nav>
+      <button class="bg-white text-black rounded-full px-5 py-2 font-medium hover:bg-white/90">立即合作</button>
+    </div>
+  </header>
 
-/** 首屏 */
-function Hero() {
-  return (
-    <section className="relative overflow-hidden">
-      <div className="mx-auto max-w-7xl px-4 pt-20 pb-24">
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.05]"
-        >
-          让
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-indigo-400">
-            心愿入轨
-          </span>
-          ，以航天级体验，定义下一代品牌叙事
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.8 }}
-          className="mt-5 max-w-2xl text-white/70"
-        >
-          我们把「写下心愿 → 点火发射 → 轨道可视化 → 徽章纪念」做成一套可被品牌、城市与校园复用的太空级互动底座。
-        </motion.p>
-        <div className="mt-8 flex flex-wrap items-center gap-3">
-          <Button className="rounded-full bg-gradient-to-r from-cyan-300 to-indigo-400 text-black font-semibold px-6 py-5 hover:opacity-90">
-            <Rocket className="mr-2 h-5 w-5" /> 立即发起任务
-          </Button>
-          <a href="orbit.html">
-            <Button
-              variant="outline"
-              className="rounded-full border-white/20 text-white hover:bg-white/10 px-6 py-5"
-            >
-              <Orbit className="mr-2 h-5 w-5" /> 查看轨道演示
-            </Button>
+  <!-- 首屏 Hero -->
+  <section class="relative overflow-hidden">
+    <div class="mx-auto max-w-7xl px-4 pt-20 pb-24">
+      <h1 class="text-4xl md:text-6xl font-bold tracking-tight leading-[1.05]">
+        让<span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-indigo-400">心愿入轨</span>，
+        以航天级体验，定义下一代品牌叙事
+      </h1>
+      <p class="mt-5 max-w-2xl text-white/70">
+        我们把「写下心愿 → 点火发射 → 轨道可视化 → 徽章纪念」做成一套可被品牌、城市与校园复用的太空级互动底座。
+      </p>
+      <div class="mt-8 flex flex-wrap items-center gap-3">
+        <button class="rounded-full bg-gradient-to-r from-cyan-300 to-indigo-400 text-black font-semibold px-6 py-5 hover:opacity-90 flex items-center gap-2">
+          <i data-lucide="rocket" class="w-5 h-5"></i> 立即发起任务
+        </button>
+        <a href="orbit.html">
+          <button class="rounded-full border border-white/20 text-white hover:bg-white/10 px-6 py-5 flex items-center gap-2">
+            <i data-lucide="orbit" class="w-5 h-5"></i> 查看轨道演示
+          </button>
+        </a>
+      </div>
+      <div class="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="rounded-lg border border-white/10 bg-white/5 p-4 text-sm">
+          <div class="text-white/50">近地轨道</div>
+          <div class="font-medium">LEO 350–550km</div>
+        </div>
+        <div class="rounded-lg border border-white/10 bg-white/5 p-4 text-sm">
+          <div class="text-white/50">任务延展</div>
+          <div class="font-medium">徽章/星图/回传</div>
+        </div>
+        <div class="rounded-lg border border-white/10 bg-white/5 p-4 text-sm">
+          <div class="text-white/50">交付形式</div>
+          <div class="font-medium">线下+线上联动</div>
+        </div>
+        <div class="rounded-lg border border-white/10 bg-white/5 p-4 text-sm">
+          <div class="text-white/50">合规保障</div>
+          <div class="font-medium">数据合规/未成年保护</div>
+        </div>
+      </div>
+    </div>
+    <div class="absolute left-1/2 -translate-x-1/2 bottom-6 text-white/60 text-xs flex items-center gap-1">
+      向下了解 <i data-lucide="arrow-down" class="h-4 w-4"></i>
+    </div>
+  </section>
+
+  <!-- 数据看板 -->
+  <section id="stats" class="mx-auto max-w-7xl px-4 py-16">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="rounded-xl border border-white/10 bg-white/5 p-6 text-center">
+        <div class="flex justify-center items-center gap-1 text-2xl font-semibold">
+          <i data-lucide="star" class="h-4 w-4"></i> 128,642
+        </div>
+        <div class="text-xs text-white/60 mt-2">累计心愿</div>
+      </div>
+      <div class="rounded-xl border border-white/10 bg-white/5 p-6 text-center">
+        <div class="flex justify-center items-center gap-1 text-2xl font-semibold">
+          <i data-lucide="rocket" class="h-4 w-4"></i> 8,312
+        </div>
+        <div class="text-xs text-white/60 mt-2">在轨心愿</div>
+      </div>
+      <div class="rounded-xl border border-white/10 bg-white/5 p-6 text-center">
+        <div class="flex justify-center items-center gap-1 text-2xl font-semibold">
+          <i data-lucide="building-2" class="h-4 w-4"></i> 116
+        </div>
+        <div class="text-xs text-white/60 mt-2">合作机构</div>
+      </div>
+      <div class="rounded-xl border border-white/10 bg-white/5 p-6 text-center">
+        <div class="flex justify-center items-center gap-1 text-2xl font-semibold">
+          <i data-lucide="globe-2" class="h-4 w-4"></i> 42
+        </div>
+        <div class="text-xs text-white/60 mt-2">覆盖城市</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="relative">
+    <div class="mx-auto max-w-6xl px-4 py-16">
+      <div class="bg-gradient-to-r from-indigo-500/20 to-cyan-400/20 border border-white/10 rounded-xl p-12">
+        <h3 class="text-2xl md:text-3xl font-semibold">把你的品牌故事，写在轨道上</h3>
+        <p class="text-white/70 mt-3">
+          从概念到落地，我们提供整套航天化叙事系统：心愿卡、发射仪式、星图可视化与纪念徽章，线上线下联动。
+        </p>
+        <div class="mt-6 flex flex-col md:flex-row gap-3">
+          <button class="rounded-full bg-white text-black px-6 py-5 font-medium flex items-center gap-2">
+            预约演示 <i data-lucide="arrow-right" class="h-4 w-4"></i>
+          </button>
+          <a href="./spaceport-leo.html" target="_blank" rel="noopener noreferrer">
+            <button class="rounded-full border border-white/20 text-white hover:bg-white/10 px-6 py-5">
+              下载方案
+            </button>
           </a>
         </div>
-        <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { k: "近地轨道", v: "LEO 350–550km" },
-            { k: "任务延展", v: "徽章/星图/回传" },
-            { k: "交付形式", v: "线下+线上联动" },
-            { k: "合规保障", v: "数据合规/未成年保护" },
-          ].map((item) => (
-            <div
-              key={item.k}
-              className="rounded-lg border border-white/10 bg-white/5 p-4 text-sm"
-            >
-              <div className="text-white/50">{item.k}</div>
-              <div className="font-medium">{item.v}</div>
-            </div>
-          ))}
-        </div>
       </div>
-      <div className="absolute left-1/2 -translate-x-1/2 bottom-6 text-white/60 text-xs flex items-center gap-1">
-        向下了解
-        <ArrowDown className="h-4 w-4" />
-      </div>
-    </section>
-  );
-}
+    </div>
+  </section>
 
-/** 品牌背书条 */
-function Trustbar() {
-  return (
-    <section className="border-t border-white/5">
-      <div className="mx-auto max-w-7xl px-4 py-8 flex flex-wrap items-center gap-x-10 gap-y-4 opacity-80">
-        <span className="text-xs uppercase tracking-[0.2em] text-white/50">
-          Trusted by
-        </span>
-        <div className="h-6 w-24 rounded bg-white/10" />
-        <div className="h-6 w-24 rounded bg-white/10" />
-        <div className="h-6 w-24 rounded bg-white/10" />
-      </div>
-    </section>
-  );
-}
-
-/** 数据看板 */
-function Stats() {
-  const stats = [
-    { k: "累计心愿", v: "128,642", icon: <Star className="h-4 w-4" /> },
-    { k: "在轨心愿", v: "8,312", icon: <Rocket className="h-4 w-4" /> },
-    { k: "合作机构", v: "116", icon: <Building2 className="h-4 w-4" /> },
-    { k: "覆盖城市", v: "42", icon: <Globe2 className="h-4 w-4" /> },
-  ];
-  return (
-    <section id="stats" className="mx-auto max-w-7xl px-4 py-16">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {stats.map((s) => (
-          <div
-            key={s.k}
-            className="rounded-xl border border-white/10 bg-white/5 p-6 text-center"
-          >
-            <div className="flex items-center justify-center gap-1 text-2xl font-semibold tracking-tight">
-              {s.icon} {s.v}
-            </div>
-            <div className="text-xs text-white/60 mt-2 uppercase tracking-[0.2em]">
-              {s.k}
-            </div>
+  <!-- 页脚 -->
+  <footer id="contact" class="border-t border-white/10">
+    <div class="mx-auto max-w-7xl px-4 py-10 grid md:grid-cols-3 gap-8">
+      <div>
+        <div class="flex items-center gap-2">
+          <div class="h-7 w-7 rounded-full bg-gradient-to-tr from-indigo-400 to-cyan-300 flex items-center justify-center">
+            <i data-lucide="sparkles" class="h-4 w-4 text-black"></i>
           </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/** CTA */
-function CTA() {
-  return (
-    <section className="relative">
-      <div className="mx-auto max-w-6xl px-4 py-16">
-        <Card className="bg-gradient-to-r from-indigo-500/20 to-cyan-400/20 border-white/10 overflow-hidden">
-          <CardContent className="p-8 md:p-12">
-            <div className="grid md:grid-cols-2 gap-8 items-center">
-              <div>
-                <h3 className="text-2xl md:text-3xl font-semibold">
-                  把你的品牌故事，写在轨道上
-                </h3>
-                <p className="text-white/70 mt-3">
-                  从概念到落地，我们提供整套航天化叙事系统：心愿卡、发射仪式、星图可视化与纪念徽章，线上线下联动。
-                </p>
-                <div className="mt-6 flex flex-col md:flex-row gap-3">
-                  <Button className="rounded-full bg-white text-black px-6 py-5 font-medium">
-                    预约演示 <ArrowRight className="ml-1 h-4 w-4" />
-                  </Button>
-
-                  {/* 下载方案按钮 */}
-                  <a
-                    href="./spaceport-leo.html"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Button
-                      variant="outline"
-                      className="rounded-full border-white/20 text-white hover:bg-white/10 px-6 py-5"
-                    >
-                      下载方案
-                    </Button>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </section>
-  );
-}
-
-/** 页脚 */
-function Footer() {
-  return (
-    <footer id="contact" className="border-t border-white/10">
-      <div className="mx-auto max-w-7xl px-4 py-10 grid md:grid-cols-3 gap-8">
-        <div>
-          <div className="flex items-center gap-2">
-            <div className="h-7 w-7 rounded-full bg-gradient-to-tr from-indigo-400 to-cyan-300 flex items-center justify-center">
-              <Sparkles className="h-4 w-4 text-black" />
-            </div>
-            <span className="font-semibold tracking-wide">星宇心愿 StellarX</span>
-          </div>
-          <p className="mt-3 text-white/60 text-sm">
-            以航天级叙事，连接品牌与大众的情感。
-          </p>
+          <span class="font-semibold tracking-wide">星宇心愿 StellarX</span>
         </div>
-        <div>
-          <h4 className="text-sm font-medium mb-3">联系</h4>
-          <ul className="space-y-2 text-sm text-white/70">
-            <li>商务合作：biz@stellars.io</li>
-            <li>媒体与活动：press@stellars.io</li>
-            <li>地址：北京 · 杭州 · 济南</li>
-          </ul>
-        </div>
-        <div>
-          <h4 className="text-sm font-medium mb-3">法律</h4>
-          <ul className="space-y-2 text-sm text-white/70">
-            <li>隐私政策</li>
-            <li>未成年人保护</li>
-            <li>数据合规声明</li>
-          </ul>
-        </div>
+        <p class="mt-3 text-white/60 text-sm">以航天级叙事，连接品牌与大众的情感。</p>
       </div>
-      <div className="border-t border-white/10 text-center text-xs text-white/50 py-4">
-        © {new Date().getFullYear()} StellarX · 星宇心愿. All rights reserved.
+      <div>
+        <h4 class="text-sm font-medium mb-3">联系</h4>
+        <ul class="space-y-2 text-sm text-white/70">
+          <li>商务合作：biz@stellars.io</li>
+          <li>媒体与活动：press@stellars.io</li>
+          <li>地址：北京 · 杭州 · 济南</li>
+        </ul>
       </div>
-    </footer>
-  );
-}
+      <div>
+        <h4 class="text-sm font-medium mb-3">法律</h4>
+        <ul class="space-y-2 text-sm text-white/70">
+          <li>隐私政策</li>
+          <li>未成年人保护</li>
+          <li>数据合规声明</li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-white/10 text-center text-xs text-white/50 py-4">
+      © 2025 StellarX · 星宇心愿. All rights reserved.
+    </div>
+  </footer>
+
+  <!-- 初始化图标 -->
+  <script>lucide.createIcons();</script>
+</body>
+</html>
