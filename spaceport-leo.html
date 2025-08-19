@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+<title>近地空间港 · 五大功能面板</title>
+<style>
+  :root{
+    --bg:#050814;
+    --panel:#0c1326;
+    --cyan:#55e7ff;
+    --violet:#ad7bff;
+    --glow: rgba(85,231,255,.65);
+    --text:#e9f3ff;
+    --muted:#95a6c7;
+    --grid: rgba(255,255,255,.04);
+    --shadow: 0 20px 50px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;background:var(--bg);color:var(--text);margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+
+  /* 星空画布 */
+  #stars{position:fixed;inset:0;z-index:-2;background:radial-gradient(1200px 800px at 70% -10%, rgba(40,80,140,.25), transparent 60%), radial-gradient(900px 600px at 10% -20%, rgba(150,50,170,.18), transparent 55%), var(--bg)}
+
+  /* 地球弧线 */
+  .earth{
+    position:fixed;left:50%;bottom:-35vh;transform:translateX(-50%);
+    width:160vmin;height:160vmin;border-radius:50%;
+    background:
+      radial-gradient(closest-side at 50% 55%, rgba(120,200,255,.08), transparent 60%),
+      radial-gradient(closest-side at 48% 50%, rgba(90,160,255,.15), transparent 62%),
+      radial-gradient(closest-side at 45% 45%, rgba(30,120,255,.16), transparent 65%);
+    box-shadow:0 -30px 120px rgba(70,180,255,.25), inset 0 0 200px rgba(0,80,200,.18);
+    filter:blur(.5px);
+    z-index:-1;
+  }
+
+  /* 顶部 HUD */
+  .hud{
+    position:fixed;top:16px;left:16px;right:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;pointer-events:none
+  }
+  .badge{
+    pointer-events:auto;
+    padding:8px 12px;border:1px solid rgba(255,255,255,.12);border-radius:999px;
+    backdrop-filter:blur(6px);
+    background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+    font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#d7e8ff;
+    box-shadow:0 6px 20px rgba(0,0,0,.25)
+  }
+  .hud .gridline{
+    flex:1;height:1px;background:linear-gradient(90deg, transparent, var(--grid) 30%, var(--grid) 70%, transparent)
+  }
+  .title{
+    pointer-events:auto;
+    padding:10px 14px 10px 12px;border:1px solid rgba(255,255,255,.14);border-radius:12px;
+    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    box-shadow:0 8px 24px rgba(0,0,0,.35);
+    display:flex;align-items:center;gap:10px
+  }
+  .title h1{margin:0;font-size:15px;letter-spacing:.06em}
+  .subtitle{font-size:12px;color:var(--muted)}
+  .pulse{
+    width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 0 var(--glow);animation:pulse 2.8s infinite ease-out
+  }
+  @keyframes pulse{0%{box-shadow:0 0 0 0 var(--glow)}100%{box-shadow:0 0 0 22px rgba(85,231,255,0)}}
+
+  /* 中央空间站环形中枢 */
+  .station{
+    position:relative;max-width:1200px;margin:14vh auto 10vh;aspect-ratio:1.9/1;display:grid;place-items:center;padding-inline:16px
+  }
+  .ring{
+    position:relative;width:min(72vmin,820px);height:min(72vmin,820px);
+    border-radius:50%;
+    background:
+      radial-gradient(closest-side, rgba(173,123,255,.18), rgba(173,123,255,0) 60%),
+      radial-gradient(closest-side, rgba(85,231,255,.22), rgba(85,231,255,0) 62%);
+    outline:1px solid rgba(255,255,255,.06);
+    box-shadow:
+      inset 0 0 50px rgba(85,231,255,.14),
+      0 0 60px rgba(85,231,255,.08),
+      0 30px 120px rgba(0,0,0,.45);
+    filter:drop-shadow(0 20px 60px rgba(0,0,0,.55));
+  }
+  .ring::before, .ring::after{
+    content:"";position:absolute;inset:8%;border-radius:50%;
+    border:1px dashed rgba(255,255,255,.12);
+  }
+  .ring::after{inset:24%}
+  .dock{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+  .dock span{
+    position:absolute;width:2px;height:12%;background:linear-gradient(180deg, rgba(255,255,255,.0), rgba(255,255,255,.22), rgba(255,255,255,.0));
+    transform-origin:50% 95%;
+    filter:drop-shadow(0 0 8px rgba(85,231,255,.45))
+  }
+  .dock span:nth-child(1){transform:rotate(18deg)}
+  .dock span:nth-child(2){transform:rotate(94deg)}
+  .dock span:nth-child(3){transform:rotate(198deg)}
+  .dock span:nth-child(4){transform:rotate(310deg)}
+
+  /* 模块容器 */
+  .modules{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+  .module{
+    pointer-events:auto;position:absolute;display:grid;gap:6px;min-width:220px;max-width:270px;padding:16px 18px;
+    color:var(--text);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)),
+      radial-gradient(120% 120% at 10% 0%, rgba(85,231,255,.10), transparent 55%),
+      radial-gradient(120% 120% at 90% 100%, rgba(173,123,255,.10), transparent 55%),
+      var(--panel);
+    box-shadow: var(--shadow), 0 0 0 1px rgba(255,255,255,.08) inset;
+    backdrop-filter: blur(6px);
+    transform-style:preserve-3d;will-change:transform, filter;
+    transition: transform .6s cubic-bezier(.18,.62,.21,.99), filter .6s, box-shadow .6s;
+  }
+  .module:hover{transform: translateZ(8px) rotateX(4deg) rotateY(-6deg);filter:brightness(1.08) saturate(1.05)}
+  .module h3{margin:2px 0 0;font-size:18px;letter-spacing:.02em}
+  .module small{color:var(--muted);font-size:12px;letter-spacing:.06em}
+  .module .tag{font-size:11px;color:#d2e9ff;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
+  .module .shine{
+    content:"";position:absolute;inset:-1px;border-radius:10px;pointer-events:none;
+    background:linear-gradient(120deg, rgba(85,231,255,.0) 20%, rgba(85,231,255,.18) 40%, rgba(173,123,255,.14) 60%, rgba(173,123,255,.0) 80%);
+    mix-blend-mode:screen;filter:blur(6px);opacity:.65;mask:linear-gradient(#000, transparent 65%)
+  }
+  .module .depth{position:absolute;inset:0;border-radius:12px;box-shadow:inset 0 0 30px rgba(0,0,0,.35), inset 0 0 2px rgba(255,255,255,.25)}
+
+  /* 不规则外形 + 定位 */
+  .module.hex {clip-path: polygon(8% 0, 92% 0, 100% 40%, 92% 100%, 8% 100%, 0 60%); top:14%; left:24%; transform:translate(-48%, -85%) rotate(-2deg); animation: floatA 8s ease-in-out infinite}
+  .module.penta{clip-path: polygon(12% 0, 88% 0, 100% 52%, 60% 100%, 0 70%); top:18%; right:20%; transform:translate(52%, -70%) rotate(3deg); animation: floatB 9.5s ease-in-out infinite}
+  .module.trape{clip-path: polygon(6% 0, 100% 6%, 92% 100%, 0 94%); bottom:12%; left:16%; transform:translate(-68%, 10%) rotate(-4deg); animation: floatC 10.2s ease-in-out infinite}
+  .module.para{clip-path: polygon(10% 0, 100% 8%, 90% 100%, 0 92%); bottom:10%; right:14%; transform:translate(60%, 26%) rotate(2deg); animation: floatD 8.6s ease-in-out infinite}
+  .module.octo{clip-path: polygon(10% 0, 90% 0, 100% 30%, 100% 70%, 90% 100%, 10% 100%, 0 70%, 0 30%); top:40%; left:50%; transform:translate(-50%,-50%) rotate(-1.5deg); animation: floatE 11s ease-in-out infinite}
+
+  @keyframes floatA{0%,100%{transform:translate(-48%,-85%) rotate(-2deg)}50%{transform:translate(-48%,-89%) rotate(-1deg)}}
+  @keyframes floatB{0%,100%{transform:translate(52%,-70%) rotate(3deg)}50%{transform:translate(52%,-73%) rotate(4.2deg)}}
+  @keyframes floatC{0%,100%{transform:translate(-68%,10%) rotate(-4deg)}50%{transform:translate(-68%,7%) rotate(-3deg)}}
+  @keyframes floatD{0%,100%{transform:translate(60%,26%) rotate(2deg)}50%{transform:translate(60%,23%) rotate(3.2deg)}}
+  @keyframes floatE{0%,100%{transform:translate(-50%,-50%) rotate(-1.5deg)}50%{transform:translate(-50%,-53%) rotate(-.5deg)}}
+
+  /* ——关键修复：卫星技术应用标题防溢出—— */
+  .module.penta h3{
+    font-size:16px;
+    line-height:1.2;
+    word-break:break-word;
+    text-align:center;
+  }
+  @media (max-width: 700px){
+    .module.penta h3{font-size:15px}
+  }
+
+  /* 响应式：窄屏堆叠 */
+  @media (max-width: 980px){
+    .ring{width:min(86vmin,640px);height:min(86vmin,640px)}
+    .module{min-width:200px;max-width:240px}
+  }
+  @media (max-width: 700px){
+    .station{margin:11vh auto 10vh}
+    .modules{display:flex;flex-direction:column;gap:14px;position:static}
+    .module{position:relative;left:auto;top:auto;right:auto;bottom:auto;transform:none !important;animation:none !important;width:min(86vw,520px)}
+  }
+
+  /* 轻微鼠标视差 */
+  .parallax{transition: transform .15s linear}
+
+  /* 返回主页按钮（底部居中，玻璃质感） */
+  .back-home{
+    position:fixed;left:50%;bottom:20px;transform:translateX(-50%);
+    display:inline-flex;align-items:center;gap:10px;
+    padding:12px 18px;border-radius:999px;
+    color:#e9f7ff;text-decoration:none;
+    border:1px solid rgba(255,255,255,.18);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.04)),
+      radial-gradient(60% 180% at 0% 0%, rgba(85,231,255,.18), transparent 60%),
+      radial-gradient(60% 180% at 100% 100%, rgba(173,123,255,.18), transparent 60%);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    letter-spacing:.06em; font-weight:600;
+    transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+    z-index:10;
+  }
+  .back-home:hover{transform:translateX(-50%) translateY(-2px); box-shadow:0 16px 40px rgba(0,0,0,.45)}
+  .back-home:active{transform:translateX(-50%) translateY(0)}
+  .back-icon{
+    width:18px;height:18px;display:inline-block;transform:translateY(1px);
+    background: conic-gradient(from 90deg at 50% 50%, var(--cyan), var(--violet));
+    -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="%23000" viewBox="0 0 24 24"><path d="M10.828 11H20a1 1 0 1 1 0 2h-9.172l3.536 3.536a1 1 0 1 1-1.414 1.414l-5.243-5.243a1.2 1.2 0 0 1 0-1.414l5.243-5.243a1 1 0 1 1 1.414 1.414L10.828 11Z"/></svg>') center/contain no-repeat;
+            mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="%23000" viewBox="0 0 24 24"><path d="M10.828 11H20a1 1 0 1 1 0 2h-9.172l3.536 3.536a1 1 0 1 1-1.414 1.414l-5.243-5.243a1.2 1.2 0 0 1 0-1.414l5.243-5.243a1 1 0 1 1 1.414 1.414L10.828 11Z"/></svg>') center/contain no-repeat;
+  }
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="earth" aria-hidden="true"></div>
+
+<!-- 顶部 HUD -->
+<div class="hud">
+  <div class="badge">LEO · Alt ~350–550 km</div>
+  <div class="gridline"></div>
+  <div class="title">
+    <div class="pulse" aria-hidden="true"></div>
+    <h1>近地空间港</h1>
+    <div class="subtitle">Spaceport LEO · Service Hub</div>
+  </div>
+</div>
+
+<!-- 中央空间站与功能面板 -->
+<section class="station">
+  <div class="ring parallax" aria-label="近地空间站中枢">
+    <div class="dock">
+      <span></span><span></span><span></span><span></span>
+    </div>
+    <div class="modules">
+      <!-- 1 运载火箭技术服务 -->
+      <article class="module hex parallax" aria-label="运载火箭技术服务">
+        <div class="depth"></div><div class="shine"></div>
+        <span class="tag">LV-Service</span>
+        <h3>运载火箭技术服务</h3>
+        <small>型号/窗口/流程一体化解决方案</small>
+      </article>
+      <!-- 2 卫星技术应用（已防溢出） -->
+      <article class="module penta parallax" aria-label="卫星技术应用">
+        <div class="depth"></div><div class="shine"></div>
+        <span class="tag">Sat-Apps</span>
+        <h3>卫星技术应用</h3>
+        <small>通导遥感 · 行业场景落地</small>
+      </article>
+      <!-- 3 商业飞船搭载 -->
+      <article class="module trape parallax" aria-label="商业飞船搭载">
+        <div class="depth"></div><div class="shine"></div>
+        <span class="tag">Capsule-Payload</span>
+        <h3>商业飞船搭载</h3>
+        <small>物品/实验/文化载荷 · 舱内舱外</small>
+      </article>
+      <!-- 4 航天科普活动 -->
+      <article class="module para parallax" aria-label="航天科普活动">
+        <div class="depth"></div><div class="shine"></div>
+        <span class="tag">STEM-Outreach</span>
+        <h3>航天科普活动</h3>
+        <small>研学/讲堂/实验 · 少年航天梦</small>
+      </article>
+      <!-- 5 火箭发射观礼（中心位） -->
+      <article class="module octo parallax" aria-label="火箭发射观礼">
+        <div class="depth"></div><div class="shine"></div>
+        <span class="tag">Launch-Viewing</span>
+        <h3>火箭发射观礼</h3>
+        <small>任务日历 · 名额预约 · 现场服务</small>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- 返回主页按钮 -->
+<a class="back-home" href="./index.html" title="返回主页">
+  <span class="back-icon" aria-hidden="true"></span> 返回主页
+</a>
+
+<script>
+/* ========= 星空粒子 ========= */
+(function(){
+  const canvas = document.getElementById('stars');
+  const ctx = canvas.getContext('2d');
+  let W, H, DPR = Math.min(window.devicePixelRatio || 1, 2);
+  let stars = [];
+  const STAR_COUNT = 220;
+  function resize(){
+    W = canvas.width = Math.floor(innerWidth * DPR);
+    H = canvas.height = Math.floor(innerHeight * DPR);
+    canvas.style.width = innerWidth + 'px';
+    canvas.style.height = innerHeight + 'px';
+    stars = new Array(STAR_COUNT).fill(0).map(()=>({
+      x: Math.random()*W,
+      y: Math.random()*H,
+      r: (Math.random()*1.2+0.2) * DPR,
+      a: Math.random()*0.7+0.3,
+      tw: Math.random()*0.02 + 0.005,
+      off: Math.random()*Math.PI*2,
+      driftX: (Math.random()-0.5)*0.06*DPR,
+      driftY: (Math.random()-0.5)*0.06*DPR
+    }));
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    for(const s of stars){
+      s.off += s.tw;
+      const alpha = s.a*(0.6 + 0.4*Math.sin(s.off));
+      s.x += s.driftX; s.y += s.driftY;
+      if(s.x < -10 || s.x > W+10 || s.y < -10 || s.y > H+10){
+        s.x = Math.random()*W; s.y = Math.random()*H;
+      }
+      const grd = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r*3.5);
+      grd.addColorStop(0, `rgba(255,255,255,${Math.min(1,alpha)})`);
+      grd.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = grd;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r*3.5, 0, Math.PI*2);
+      ctx.fill();
+
+      ctx.fillStyle = `rgba(255,255,255,${Math.min(1,alpha+0.15)})`;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+  addEventListener('resize', resize, {passive:true});
+  resize(); draw();
+})();
+
+/* ========= 轻微鼠标视差 ========= */
+(function(){
+  const els = Array.from(document.querySelectorAll('.parallax'));
+  let cx = innerWidth/2, cy = innerHeight/2;
+  addEventListener('mousemove', (e)=>{
+    const dx = (e.clientX - cx)/cx;
+    const dy = (e.clientY - cy)/cy;
+    els.forEach((el)=>{
+      const base = el.getAttribute('data-base') || '';
+      const depth = Number(el.getAttribute('data-depth') || 6);
+      el.style.transform = `${base} translate3d(${dx*depth}px, ${dy*depth}px, 0)`;
+    });
+  }, {passive:true});
+  // 记录初始 transform
+  els.forEach(el=>{
+    const style = getComputedStyle(el).transform;
+    el.setAttribute('data-base', style === 'none' ? '' : style);
+  });
+})();
+</script>
+</body>
+</html>
